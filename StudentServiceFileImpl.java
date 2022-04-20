@@ -2,6 +2,7 @@ package com.hcl.myproject.crud.entity;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -92,21 +93,20 @@ public class StudentServiceFileImpl {
 		footer();
 	}
 
-	 public static Connection getConnection() {
-	        // Registering drivers
-	    	//DriverManager.registerDriver();
-		 
-
-	        try {Connection dbconnection= DriverManager.getConnection("jdbc:mysql://localhost:3306/Studentdb","root","Aleesha@01");{
-	        	Statement st= dbconnection.createStatement();
-	        st.execute("create table student(id numeric(10), name varchar(100),age varchar(100),contact numeric(10),primary key(id))");
-	        } }catch (SQLException e) {
-	        	// TODO Auto-generated catch block
-	        	e.printStackTrace();
-	        }
-			return null;
-			
-	 }
+	public static Connection getConnection() {
+        Connection connection = null;
+        try {
+            String jdbcURL = "jdbc:mysql://localhost:3306/studentdb";
+            String jdbcUsername = "root";
+            String jdbcPassword = "Aleesha@01";
+            connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
+            return connection;
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
 	
 	private static void inputDataBack(Set<Student1> studentSet, File file) throws IOException {
 		try (FileWriter fw = new FileWriter(file);) {
@@ -448,10 +448,18 @@ private static void searchStudent(Set<Student1> studentSet, Scanner myObj, Conne
 
     		
     		//SQL PART
-    		String insertSql = "insert into student values(" + id + ",'" + name + "'," + age + ", " + contact + "now() )";
+    		PreparedStatement pst=sqlConnection.prepareStatement("insert into student values (?,?,?,?)");
+            pst.setInt(1,id);
+            pst.setString(2,name);
+            pst.setInt(3,age);
+            pst.setInt(4,contact);
+            pst.executeUpdate();
+            
+            
+    		//String insertSql = "insert into student values(" + id + ",'" + name + "'," + age + ", " + contact + "now() )";
     		
-    		Statement st = sqlConnection.createStatement();
-    		st.executeUpdate(insertSql);
+    		//Statement st = sqlConnection.createStatement();
+    		//st.executeUpdate(insertSql);
     		
     		
     	} catch (Exception e) {
